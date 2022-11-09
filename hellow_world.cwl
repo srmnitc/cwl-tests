@@ -1,17 +1,36 @@
-cwlVersion: v1.2
+class: Workflow
+cwlVersion: v1.0
 
-# What type of CWL process we have in this document.
-class: CommandLineTool
-# This CommandLineTool executes the linux "echo" command-line tool.
-baseCommand: echo
+doc: This workflow convert fastq to multiple fasta files
+label: FASTQ Vector Removal
 
-# The inputs for this process.
+requirements:
+  InlineJavascriptRequirement: {}
+  ScatterFeatureRequirement: {}
+
 inputs:
-  message:
-    type: string
-    # A default value that can be overridden, e.g. --message "Hola mundo"
-    default: "Hello World"
-    # Bind this message value as an argument to "echo".
-    inputBinding:
-      position: 1
-outputs: []
+  fastq1: File
+  fastq2: File?
+  fsa: File
+  total_per_file: int
+
+outputs:
+  output:
+    outputSource: split_fasta/output
+    type: File[]
+
+steps:
+  create_fasta_from_fastq:
+    label: Create FASTA from FASTQ
+    run: ../../tools/basic/fastq2fasta.cwl
+    in:
+      fastq1: fastq1
+      fastq2: fastq2
+    out: [output]
+  split_fasta:
+    run: ../../tools/python/split-fasta.cwl
+    label: Split fasta
+    in:
+      fasta: create_fasta_from_fastq/output
+      total_per_file: total_per_file
+    out: [output]
