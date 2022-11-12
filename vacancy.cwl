@@ -1,9 +1,7 @@
 cwlVersion: v1.2
 class: Workflow
 
-requirements:
-   ScatterFeatureRequirement: {}
- 
+
 inputs:
    element:
       type: string
@@ -23,6 +21,7 @@ steps:
              supercell: int[]
         outputs:
           structure:
+            label: "structure"
             type: File
       in:
          element: element
